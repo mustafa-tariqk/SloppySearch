@@ -14,6 +14,9 @@ class Database:
     """
 
     def __init__(self):
+        """
+        Initialize a new instance of the SloppySearch class.
+        """
         self.vectors = []
 
 
