@@ -1,0 +1,12 @@
+[build-system]
+requires = ["setuptools", "wheel"]
+
+[metadata]
+name = "sloppy_search"
+version = "0.1.0"
+description = "A simple and efficient search engine"
+authors = ["Mustafa Tariq <mustafa.tariqk@example.com>"]
+
+[options]
+python_requires = ">=3.8"
+install_requires = ["numpy>=1.21.2"]
