@@ -5,7 +5,7 @@ requires = ["setuptools", "wheel"]
 name = "sloppy_search"
 version = "0.1.0"
 description = "A simple and efficient search engine"
-authors = ["Mustafa Tariq <mustafa.tariqk@example.com>"]
+authors = ["Mustafa Tariq"]
 
 [options]
 python_requires = ">=3.8"
