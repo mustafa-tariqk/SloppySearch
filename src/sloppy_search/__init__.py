@@ -17,10 +17,13 @@ class Database:
 
     def add_vectors(self, vector):
         """
-        Add a vector to the database.
+        Add a vector or a list of vectors to the existing vectors.
 
         Args:
-            vector (np.array): The vector to be added.
+            vector: A single vector or a list of vectors to be added.
+
+        Returns:
+            None
         """
         self.vectors.extend(vector)
 
