@@ -15,14 +15,14 @@ class Database:
     def __init__(self):
         self.vectors = []
 
-    def add_vector(self, vector):
+    def add_vectors(self, vector):
         """
         Add a vector to the database.
 
         Args:
             vector (np.array): The vector to be added.
         """
-        self.vectors.append(vector)
+        self.vectors.extend(vector)
 
     def search(self, query_vector, k=10):
         """
