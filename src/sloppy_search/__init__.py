@@ -1,9 +1,5 @@
 import numpy as np
 
-class Vector:
-    def __init__(self, data):
-        self.data = np.array(data)
-
 class Database:
     """
     A class representing a database of vectors for similarity search.
@@ -24,7 +20,7 @@ class Database:
         Add a vector to the database.
 
         Args:
-            vector: The vector to be added.
+            vector (np.array): The vector to be added.
         """
         self.vectors.append(vector)
 
@@ -33,13 +29,13 @@ class Database:
         Perform a similarity search on the database.
 
         Args:
-            query_vector: The query vector for similarity search.
+            query_vector (np.array): The query vector for similarity search.
             k (int): The number of nearest neighbors to retrieve.
 
         Returns:
             distances (ndarray): An array of distances between the query vector and the nearest neighbors.
             top_k_indices (ndarray): An array of indices of the nearest neighbors in the database.
         """
-        distances = np.linalg.norm(np.array([v.data for v in self.vectors]) - query_vector.data, axis=1)
+        distances = np.linalg.norm(np.array(self.vectors) - query_vector, axis=1)
         top_k_indices = np.argsort(distances)[:k]
         return distances[top_k_indices], top_k_indices
