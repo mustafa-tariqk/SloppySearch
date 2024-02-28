@@ -13,30 +13,8 @@ class Database:
         search: Perform a similarity search on the database.
     """
 
-    def __init__(self, filename=None):
-        """
-        Initialize the database.
-
-        If a filename is provided, attempt to load the serialized object from the file.
-        If no filename is provided, or if loading fails, initialize an empty database.
-
-        Parameters:
-        - filename (str, optional): The name of the file to load the serialized object. Defaults to None.
-
-        Returns:
-        None
-        """
-        if filename is not None:
-            try:
-                with open(filename + ".pkl", "rb") as file:
-                    data = pickle.load(file)
-                    for attr in vars(data):
-                        setattr(self, attr, getattr(data, attr))
-            except:
-                print("Failed to load the serialized object from the file.")
-                self.vectors = []
-        else:
-            self.vectors = []
+    def __init__(self):
+        self.vectors = []
 
 
     def add_vectors(self, vector):
@@ -81,3 +59,19 @@ class Database:
         """
         with open(filename + ".pkl", "wb") as file:
             pickle.dump(self, file)
+
+
+    def deserialize(self, filename):
+        """
+        Deserialize the object using pickle.
+
+        Parameters:
+        - filename (str): The name of the file to load the serialized object.
+
+        Returns:
+        None
+        """
+        with open(filename + ".pkl", "rb") as file:
+            data = pickle.load(file)
+            for attr in vars(data):
+                setattr(self, attr, getattr(data, attr))
