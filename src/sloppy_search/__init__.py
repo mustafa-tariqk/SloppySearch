@@ -3,76 +3,81 @@ import pickle
 
 class Database:
     """
-    A class representing a database of vectors for similarity search.
+    A class representing a database for storing and searching vectors.
 
     Attributes:
-        vectors (list): A list of vectors in the database.
+        num_hash_tables (int): The number of hash tables to use for indexing.
+        hash_size (int): The size of each hash table.
+        hash_tables (list): A list of hash tables used for indexing vectors.
 
     Methods:
-        add_vector: Add a vector to the database.
-        search: Perform a similarity search on the database.
+        add_vectors(vectors): Add vectors to the database.
+        search(query_vector, k): Search for the nearest neighbors of a query vector.
+        serialize(filename): Serialize the database to a file.
+        deserialize(filename): Deserialize the database from a file.
     """
 
-    def __init__(self):
-        """
-        Initialize a new instance of the SloppySearch class.
-        """
-        self.vectors = []
+    def __init__(self, num_hash_tables=15, hash_size=200):
+        self.num_hash_tables = num_hash_tables
+        self.hash_size = hash_size
+        self.hash_tables = [{} for _ in range(num_hash_tables)]
 
-
-    def add_vectors(self, vector):
+    def add_vectors(self, vectors):
         """
-        Add a vector or a list of vectors to the existing vectors.
+        Add vectors to the database.
 
         Args:
-            vector: A single vector or a list of vectors to be added.
-
-        Returns:
-            None
+            vectors (list): A list of vectors to add to the database.
         """
-        self.vectors.extend(vector)
-
+        vectors = np.array(vectors)
+        hashed_vectors = self.hash_vector(vectors)
+        for i in range(self.num_hash_tables):
+            hash_vals = hashed_vectors[:, i]
+            unique_hash_vals, counts = np.unique(hash_vals, return_counts=True)
+            for hash_val, count in zip(unique_hash_vals, counts):
+                indices = np.where(hash_vals == hash_val)[0]
+                if hash_val not in self.hash_tables[i]:
+                    self.hash_tables[i][hash_val] = []
+                self.hash_tables[i][hash_val].extend(vectors[indices])
 
     def search(self, query_vector, k=10):
         """
-        Perform a similarity search on the database.
+        Search for the nearest neighbors of a query vector.
 
         Args:
-            query_vector (np.array): The query vector for similarity search.
+            query_vector (list): The query vector.
             k (int): The number of nearest neighbors to retrieve.
 
         Returns:
-            distances (ndarray): An array of distances between the query vector and the nearest neighbors.
-            top_k_indices (ndarray): An array of indices of the nearest neighbors in the database.
+            list: The k nearest neighbors of the query vector.
         """
-        distances = np.linalg.norm(np.array(self.vectors) - query_vector, axis=1)
-        top_k_indices = np.argsort(distances)[:k]
-        return distances[top_k_indices], top_k_indices
-    
+        hashed_query = self.hash_vector(query_vector)
+        candidates = set()
+        for i in range(self.num_hash_tables):
+            hash_val = hashed_query[i]
+            if hash_val in self.hash_tables[i]:
+                candidates.update(self.hash_tables[i][hash_val])
+        candidates = np.array(list(candidates))
+        distances = np.linalg.norm(candidates - np.array(query_vector), axis=1)
+        sorted_indices = np.argsort(distances)
+        return candidates[sorted_indices[:k]]
 
     def serialize(self, filename="database"):
         """
-        Serialize the object using pickle.
+        Serialize the database to a file.
 
-        Parameters:
-        - filename (str): The name of the file to save the serialized object. Defaults to "database".
-
-        Returns:
-        None
+        Args:
+            filename (str): The name of the file to save the serialized database to.
         """
         with open(filename + ".pkl", "wb") as file:
             pickle.dump(self, file)
 
-
     def deserialize(self, filename):
         """
-        Deserialize the object using pickle.
+        Deserialize the database from a file.
 
-        Parameters:
-        - filename (str): The name of the file to load the serialized object.
-
-        Returns:
-        None
+        Args:
+            filename (str): The name of the file to deserialize the database from.
         """
         with open(filename + ".pkl", "rb") as file:
             data = pickle.load(file)
